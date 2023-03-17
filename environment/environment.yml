@@ -1,0 +1,43 @@
+
+
+# Step 1 - install Miniconda to anaconda3 for saving space: https://conda.io/en/latest/miniconda.html
+
+# conda install -c conda-forge mamba -y
+
+# Step 2 - create conda env : mamba env create --file environment.yml
+
+# To remove an environment: mamba remove --name yolo --all -y
+
+# To update an environment: mamba env update --file environment.yml  --prune
+# with .env : mamba env update --prefix ./env --file environment.yml  --prune
+
+name: yolo
+
+channels:
+  - defaults
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.8
+  - pip
+  - cudatoolkit=11.3.1
+  - conda-forge:cudnn=8.4.1.50
+  - numpy=1.19.5
+  - scikit-learn
+  - matplotlib
+  - scipy 
+  - pandas=1.4.4
+  - tqdm
+  - onnxruntime=1.10.0
+  - pytorch:torchvision=0.13.1=py38_cu113
+  - yaml
+  - pyyaml
+  - seaborn
+  #- dlib
+  - opencv
+  - onnxruntime=1.10.0
+  - onnx=1.11.0
+  - coremltools
+  - pytorch:pytorch=1.12.1=py3.8_cuda11.3_cudnn8.3.2_0
+      
+  
