@@ -1,4 +1,7 @@
 
+cd ../../data/yolo/models
+wget https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7.pt
+
 # Yolo
 python export.py --weights ../../data/yolo/models/yolov7.pt --grid --end2end --dynamic-batch --simplify --topk-all 100 --iou-thres 0.65 --conf-thres 0.35 --img-size 640 640
 

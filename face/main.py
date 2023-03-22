@@ -105,7 +105,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     #parser.add_argument('--modelpath', type=str, default='onnx_havepost_models/yolov7-lite-e.onnx',help="onnx filepath")
     #parser.add_argument('--modelpath', type=str, default='../data/yolo_face/models/yolov7-face.onnx',help="onnx filepath")
-    parser.add_argument('--modelpath', type=str, default='../data/yolo_face/models/yolov7-tiny.onnx',help="onnx filepath")
+    parser.add_argument('--modelpath', type=str, default='../../data/yolo_face/models/yolov7.onnx',help="onnx filepath")
 
     parser.add_argument('--imgpath', type=str, default='selfie.jpg', help="image path")
     parser.add_argument('--confThreshold', default=0.45, type=float, help='class confidence')
