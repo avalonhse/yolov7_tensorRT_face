@@ -87,12 +87,15 @@ class YOLOv7_face:
 
     def draw_detections(self, image, boxes, scores, kpts):
         for box, score, kp in zip(boxes, scores, kpts):
-            x, y, w, h = box.astype(int)
-
+            
+            # x, y, w, h = box.astype(int)
+            x, y, w, h = box.astype(int)[0]
+            kp = kp[0]
+            
             # Draw rectangle
             cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), thickness=2)
             label = self.class_names[0]
-            labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+            #labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
             # top = max(y1, labelSize[1])
             # cv.rectangle(frame, (left, top - round(1.5 * labelSize[1])), (left + round(1.5 * labelSize[0]), top + baseLine), (255,255,255), cv.FILLED)
             cv2.putText(image, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), thickness=2)
@@ -124,12 +127,15 @@ if __name__ == '__main__':
         boxes, scores, kpts = YOLOv7_face_detector.detect(srcimg)
 
         print("--- %s seconds ---" % (time.time() - start_time))
+        #print(boxes)
 
         # Draw detections
+        start_time = time.time()
+
         dstimg = YOLOv7_face_detector.draw_detections(srcimg, boxes, scores, kpts)
         winName = 'Deep learning object detection in ONNXRuntime'
 
-        #print("--- %s seconds ---" % (time.time() - start_time))
+        print("--- %s seconds ---" % (time.time() - start_time))
 
         cv2.imwrite("result.jpg", dstimg)
     
