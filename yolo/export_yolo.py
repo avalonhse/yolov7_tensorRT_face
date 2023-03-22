@@ -62,20 +62,36 @@ if __name__ == '__main__':
                 m.act = Hardswish()
             elif isinstance(m.act, nn.SiLU):
                 m.act = SiLU()
-        # elif isinstance(m, models.yolo.Detect):
-        #     m.forward = m.forward_export  # assign forward (optional)
+                
+    # yolo
     model.model[-1].export = not opt.grid  # set Detect() layer grid export
     y = model(img)  # dry run
     if opt.include_nms:
         model.model[-1].include_nms = True
         y = None
-
+    
+    # yolo_face
+    # model.model[-1].export = not (opt.grid or opt.export_nms) # set Detect() layer grid export
+    # for _ in range(2):
+    #     y = model(img)  # dry runs
+    # output_names = ["output"]
+    # if opt.export_nms:
+    #     nms = models.common.NMS(conf=0.01, kpt_label=4)
+    #     nms_export = models.common.NMS_Export(conf=0.01, kpt_label=4)
+    #     y_export = nms_export(y)
+    #     y = nms(y)
+    #     model_nms = torch.nn.Sequential(model, nms_export)
+    #     model_nms.eval()
+    #     output_names = ['detections']
+    # print(f"\n{colorstr('PyTorch:')} starting from {opt.weights} ({file_size(opt.weights):.1f} MB)")
+    
     # ONNX export
     try:
         import onnx
 
         print('\nStarting ONNX export with onnx %s...' % onnx.__version__)
         f = opt.weights.replace('.pt', '.onnx')  # filename
+        
         model.eval()
         output_names = ['classes', 'boxes'] if y is None else ['output']
         dynamic_axes = None
@@ -100,6 +116,7 @@ if __name__ == '__main__':
                     'output': {0: 'batch'},
                 }
             dynamic_axes.update(output_axes)
+            
         if opt.grid:
             if opt.end2end:
                 print('\nStarting export end2end onnx model for %s...' % 'TensorRT' if opt.max_wh is None else 'onnxruntime')
@@ -131,7 +148,16 @@ if __name__ == '__main__':
                 import onnxsim
 
                 print('\nStarting to simplify ONNX...')
+                
+                # yolo_face
                 onnx_model, check = onnxsim.simplify(onnx_model)
+                
+                # yolo_face
+                #model_onnx, check = onnxsim.simplify(onnx_model,
+                #                                     dynamic_input_shape=opt.dynamic,
+                #                                     input_shapes={'images': list(img.shape)} if opt.dynamic else None)
+                
+                
                 assert check, 'assert check failed'
             except Exception as e:
                 print(f'Simplifier failure: {e}')

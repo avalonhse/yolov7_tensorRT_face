@@ -50,11 +50,6 @@ if __name__ == '__main__':
 
     # Input
     img = torch.zeros(opt.batch_size, 3, *opt.img_size).to(device)  # image size(1,3,320,192) iDetection
-    # img = cv2.imread("/user/a0132471/Files/bit-bucket/pytorch/jacinto-ai-pytest/data/results/datasets/pytorch_coco_mmdet_img_resize640_val2017_5k_yolov5/images/val2017/000000000139.png")
-    # img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
-    # img = np.ascontiguousarray(img)
-    # img = torch.tensor(img[None,:,:,:], dtype = torch.float32)
-    # img /= 255
 
     # Update model
     for k, m in model.named_modules():
@@ -64,8 +59,7 @@ if __name__ == '__main__':
                 m.act = Hardswish()
             elif isinstance(m.act, nn.SiLU):
                 m.act = SiLU()
-        # elif isinstance(m, models.yolo.Detect):
-        #     m.forward = m.forward_export  # assign forward (optional)
+                
     model.model[-1].export = not (opt.grid or opt.export_nms) # set Detect() layer grid export
     for _ in range(2):
         y = model(img)  # dry runs
@@ -78,7 +72,6 @@ if __name__ == '__main__':
         nms_export = models.common.NMS_Export(conf=0.01, kpt_label=4)
         y_export = nms_export(y)
         y = nms(y)
-        #assert (torch.sum(torch.abs(y_export[0]-y[0]))<1e-6)
         model_nms = torch.nn.Sequential(model, nms_export)
         model_nms.eval()
         output_names = ['detections']
@@ -104,6 +97,7 @@ if __name__ == '__main__':
 
         print(f'{prefix} starting export with onnx {onnx.__version__}...')
         f = opt.weights.replace('.pt', '.onnx')  # filename
+        
         if opt.export_nms:
             torch.onnx.export(model_nms, img, f, verbose=False, opset_version=11, input_names=['images'], output_names=output_names,
                               dynamic_axes={'images': {0: 'batch', 2: 'height', 3: 'width'},  # size(1,3,640,640)
