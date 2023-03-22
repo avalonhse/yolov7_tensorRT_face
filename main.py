@@ -8,12 +8,14 @@ class YOLOv7_face:
         self.conf_threshold = conf_thres
         self.iou_threshold = iou_thres
         self.class_names = ['face']
+        
         # Initialize model
         session_option = onnxruntime.SessionOptions()
         session_option.log_severity_level = 3
         # self.session = onnxruntime.InferenceSession(path, providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
         self.session = onnxruntime.InferenceSession(path, sess_options=session_option)
         model_inputs = self.session.get_inputs()
+        
         self.input_names = [model_inputs[i].name for i in range(len(model_inputs))]
         self.input_shape = model_inputs[0].shape
         self.input_height = int(self.input_shape[2])
@@ -21,26 +23,6 @@ class YOLOv7_face:
 
         model_outputs = self.session.get_outputs()
         self.output_names = [model_outputs[i].name for i in range(len(model_outputs))]
-
-    def resize_image(self, srcimg, keep_ratio=True):
-        top, left, newh, neww = 0, 0, self.input_width, self.input_height
-        if keep_ratio and srcimg.shape[0] != srcimg.shape[1]:
-            hw_scale = srcimg.shape[0] / srcimg.shape[1]
-            if hw_scale > 1:
-                newh, neww = self.input_height, int(self.input_width / hw_scale)
-                img = cv2.resize(srcimg, (neww, newh), interpolation=cv2.INTER_AREA)
-                left = int((self.input_width - neww) * 0.5)
-                img = cv2.copyMakeBorder(img, 0, 0, left, self.input_width - neww - left, cv2.BORDER_CONSTANT,
-                                         value=(114, 114, 114))  # add border
-            else:
-                newh, neww = int(self.input_height * hw_scale), self.input_width
-                img = cv2.resize(srcimg, (neww, newh), interpolation=cv2.INTER_AREA)
-                top = int((self.input_height - newh) * 0.5)
-                img = cv2.copyMakeBorder(img, top, self.input_height - newh - top, 0, 0, cv2.BORDER_CONSTANT,
-                                         value=(114, 114, 114))
-        else:
-            img = cv2.resize(srcimg, (self.input_width, self.input_height), interpolation=cv2.INTER_AREA)
-        return img, newh, neww, top, left
 
     def prepare_input(self, image):
         self.img_height, self.img_width = image.shape[:2]
@@ -51,7 +33,6 @@ class YOLOv7_face:
 
         # Resize input image
         input_img = cv2.resize(input_img, (self.input_width, self.input_height))
-        # input_img, newh, neww, top, left = self.resize_image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB)) ###也可以使用保持高宽比resize的pad填充
 
         # Scale input pixel values to 0 to 1
         input_img = input_img.astype(np.float32) / 255.0
@@ -123,7 +104,8 @@ class YOLOv7_face:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     #parser.add_argument('--modelpath', type=str, default='onnx_havepost_models/yolov7-lite-e.onnx',help="onnx filepath")
-    parser.add_argument('--modelpath', type=str, default='../data/yolo_face/models/yolov7-face.onnx',help="onnx filepath")
+    #parser.add_argument('--modelpath', type=str, default='../data/yolo_face/models/yolov7-face.onnx',help="onnx filepath")
+    parser.add_argument('--modelpath', type=str, default='../data/yolo_face/models/yolov7-tiny.onnx',help="onnx filepath")
 
     parser.add_argument('--imgpath', type=str, default='selfie.jpg', help="image path")
     parser.add_argument('--confThreshold', default=0.45, type=float, help='class confidence')
@@ -134,12 +116,23 @@ if __name__ == '__main__':
     YOLOv7_face_detector = YOLOv7_face(args.modelpath, conf_thres=args.confThreshold, iou_thres=args.nmsThreshold)
     srcimg = cv2.imread(args.imgpath)
 
-    # Detect Objects
-    boxes, scores, kpts = YOLOv7_face_detector.detect(srcimg)
+    for i in range(1):
+        import time
+        start_time = time.time()
 
-    # Draw detections
-    dstimg = YOLOv7_face_detector.draw_detections(srcimg, boxes, scores, kpts)
-    winName = 'Deep learning object detection in ONNXRuntime'
+        # Detect Objects
+        boxes, scores, kpts = YOLOv7_face_detector.detect(srcimg)
+
+        print("--- %s seconds ---" % (time.time() - start_time))
+
+        # Draw detections
+        dstimg = YOLOv7_face_detector.draw_detections(srcimg, boxes, scores, kpts)
+        winName = 'Deep learning object detection in ONNXRuntime'
+
+        #print("--- %s seconds ---" % (time.time() - start_time))
+
+        cv2.imwrite("result.jpg", dstimg)
+    
     #cv2.namedWindow(winName, 0)
     #cv2.imshow(winName, dstimg)
     #cv2.waitKey(0)
