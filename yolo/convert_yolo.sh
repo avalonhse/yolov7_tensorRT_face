@@ -28,7 +28,7 @@ dynamic_batching { }' >> ./yolov7/config.pbtxt
 cp yolov7-fp16-1x8x8.engine ./yolov7/1/model.plan
 
 cd ..
-docker run --gpus all --rm --ipc=host --shm-size=1g --ulimit stack=67108864 -p8000:8000 -p8001:8001 -p8002:8002 -v$(pwd)/yolov7:/models/yolov7 nvcr.io/nvidia/tritonserver:22.06-py3 tritonserver --model-repository=/models --strict-model-config=false --log-verbose 1
+docker run --gpus all --name yolo --rm --ipc=host --shm-size=1g --ulimit stack=67108864 -p8000:8000 -p8001:8001 -p8002:8002 -v$(pwd)/yolov7:/models/yolov7 nvcr.io/nvidia/tritonserver:22.06-py3 tritonserver --model-repository=/models --strict-model-config=false --log-verbose 1
 
 #Test
 # docker run -it --ipc=host --rm --net=host nvcr.io/nvidia/tritonserver:22.06-py3-sdk /bin/bash

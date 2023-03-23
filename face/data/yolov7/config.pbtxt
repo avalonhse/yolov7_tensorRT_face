@@ -1,0 +1,4 @@
+name: "yolov7"
+platform: "tensorrt_plan"
+max_batch_size: 1
+dynamic_batching { }

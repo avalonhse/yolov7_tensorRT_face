@@ -8,21 +8,11 @@ import cv2
 import tritonclient.grpc as grpcclient
 from tritonclient.utils import InferenceServerException
 
-#from processing import preprocess, postprocess
-
-from render import render_box, render_filled_box, get_text_size, render_text, RAND_COLORS
-from labels import COCOLabels
-
 INPUT_NAMES = ["images"]
 OUTPUT_NAMES = ["output"]
 
 def extract_boxes(predictions, scale):
-    # self.scale = np.array(
-    #         [self.img_width / self.input_width, self.img_height / self.input_height, self.img_width / self.input_width,
-    #          self.img_height / self.input_height], dtype=np.float32)
-    
-    #scale = np.array([1,1,1,1], dtype=np.float32)
-    
+
     # Extract boxes from predictions
     boxes = predictions[:, :4] * scale
     kpts = predictions[:, 6:]  ###x1,y1,score1, ...., x5,y5,score5
@@ -111,41 +101,17 @@ if __name__ == '__main__':
                         help='Video output fps, default 24.0 FPS')
     parser.add_argument('-i','--model-info',action="store_true",required=False,default=False,
                         help='Print model status, configuration and statistics')
-    parser.add_argument('-v',
-                        '--verbose',
-                        action="store_true",
-                        required=False,
-                        default=False,
+    parser.add_argument('-v','--verbose', action="store_true",required=False, default=False,
                         help='Enable verbose client output')
-    parser.add_argument('-t',
-                        '--client-timeout',
-                        type=float,
-                        required=False,
-                        default=None,
+    parser.add_argument('-t','--client-timeout',type=float, required=False, default=None,
                         help='Client timeout in seconds, default no timeout')
-    parser.add_argument('-s',
-                        '--ssl',
-                        action="store_true",
-                        required=False,
-                        default=False,
+    parser.add_argument('-s', '--ssl', action="store_true", required=False, default=False,
                         help='Enable SSL encrypted channel to the server')
-    parser.add_argument('-r',
-                        '--root-certificates',
-                        type=str,
-                        required=False,
-                        default=None,
+    parser.add_argument('-r', '--root-certificates', type=str, required=False,default=None,
                         help='File holding PEM-encoded root certificates, default none')
-    parser.add_argument('-p',
-                        '--private-key',
-                        type=str,
-                        required=False,
-                        default=None,
+    parser.add_argument('-p', '--private-key',  type=str, required=False, default=None,
                         help='File holding PEM-encoded private key, default is none')
-    parser.add_argument('-x',
-                        '--certificate-chain',
-                        type=str,
-                        required=False,
-                        default=None,
+    parser.add_argument('-x', '--certificate-chain', type=str, required=False, default=None,
                         help='File holding PEM-encoded certicate chain default is none')
 
     FLAGS = parser.parse_args()
