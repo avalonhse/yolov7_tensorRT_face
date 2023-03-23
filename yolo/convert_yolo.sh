@@ -31,7 +31,7 @@ cd ..
 docker run --gpus all --rm --ipc=host --shm-size=1g --ulimit stack=67108864 -p8000:8000 -p8001:8001 -p8002:8002 -v$(pwd)/yolov7:/models/yolov7 nvcr.io/nvidia/tritonserver:22.06-py3 tritonserver --model-repository=/models --strict-model-config=false --log-verbose 1
 
 #Test
-# docker run -it --ipc=host --net=host nvcr.io/nvidia/tritonserver:22.06-py3-sdk /bin/bash
+# docker run -it --ipc=host --rm --net=host nvcr.io/nvidia/tritonserver:22.06-py3-sdk /bin/bash
 # ./install/bin/perf_analyzer -m yolov7 -u 127.0.0.1:8001 -i grpc --shared-memory system --concurrency-range 16
 
 cd ../../../yolov7_tensorRT_face/yolo/test

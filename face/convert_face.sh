@@ -9,3 +9,6 @@ cd data/yolo/models
 docker cp yolov7.onnx yolo:/workspace/
 
 ./tensorrt/bin/trtexec --onnx=yolov7.onnx --fp16 --saveEngine=yolov7-fp16-1x8x8.engine --timingCacheFile=timing.cache
+
+
+python client.py image data/selfie.jpg

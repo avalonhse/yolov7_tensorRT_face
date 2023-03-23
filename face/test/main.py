@@ -20,6 +20,9 @@ class YOLOv7_face:
         self.input_shape = model_inputs[0].shape
         self.input_height = int(self.input_shape[2])
         self.input_width = int(self.input_shape[3])
+        
+        print("input_height =" ,self.input_height)
+        print("input_width =" , self.input_height)
 
         model_outputs = self.session.get_outputs()
         self.output_names = [model_outputs[i].name for i in range(len(model_outputs))]
@@ -45,11 +48,15 @@ class YOLOv7_face:
 
         # Perform inference on the image
         outputs = self.session.run(self.output_names, {input_name: input_tensor for input_name in self.input_names})
+        print("output =",type(outputs))
+        
         boxes, scores, kpts = self.process_output(outputs)
         return boxes, scores, kpts
 
     def process_output(self, output):
         predictions = np.squeeze(output[0]).reshape((-1, 21))
+        print("predictions =",type(predictions))
+        print("shape =",predictions.shape)
 
         # Filter out object confidence scores below threshold
         obj_conf = predictions[:, 4]
@@ -108,9 +115,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     #parser.add_argument('--modelpath', type=str, default='onnx_havepost_models/yolov7-lite-e.onnx',help="onnx filepath")
     #parser.add_argument('--modelpath', type=str, default='../data/yolo_face/models/yolov7-face.onnx',help="onnx filepath")
-    parser.add_argument('--modelpath', type=str, default='../../data/yolo_face/models/yolov7.onnx',help="onnx filepath")
+    parser.add_argument('--modelpath', type=str, default='../../../data/yolo_face/models/yolov7.onnx',help="onnx filepath")
 
-    parser.add_argument('--imgpath', type=str, default='selfie.jpg', help="image path")
+    parser.add_argument('--imgpath', type=str, default='./data/selfie.jpg', help="image path")
     parser.add_argument('--confThreshold', default=0.45, type=float, help='class confidence')
     parser.add_argument('--nmsThreshold', default=0.5, type=float, help='nms iou thresh')
     args = parser.parse_args()
@@ -137,7 +144,7 @@ if __name__ == '__main__':
 
         print("--- %s seconds ---" % (time.time() - start_time))
 
-        cv2.imwrite("result.jpg", dstimg)
+        cv2.imwrite("./data/selfie_result.jpg", dstimg)
     
     #cv2.namedWindow(winName, 0)
     #cv2.imshow(winName, dstimg)
